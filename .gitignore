@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (raw files can be heavy — keep processed only if needed)
+data/raw/*.csv
+
+# Power BI source (share screenshots instead)
+dashboard/*.pbix
