@@ -13,8 +13,8 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Data (raw files can be heavy — keep processed only if needed)
-data/raw/*.csv
+# Data (large raw files — exclude heavy ones, include project datasets)
+# data/raw/*.csv  ← intentionally included for portfolio reproducibility
 
 # Power BI source (share screenshots instead)
 dashboard/*.pbix
