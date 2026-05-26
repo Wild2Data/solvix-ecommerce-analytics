@@ -1,6 +1,6 @@
 """
 Construye notebooks/03_product_profitability.ipynb con outputs ejecutados.
-Ejecutar desde la raiz del proyecto con: python -X utf8 run_products_notebook.py
+Ejecutar desde la raiz del proyecto con: python -X utf8 scripts/run_products_notebook.py
 """
 import sys, io, json, traceback, base64, os
 import pandas as pd
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 # ---------------------------------------------------------------------------
 # CONTENIDO DE LAS CELDAS
