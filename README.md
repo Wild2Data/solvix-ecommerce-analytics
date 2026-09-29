@@ -1,108 +1,54 @@
 # Solvix E-commerce Analytics
 
-End-to-end analytics project for **Solvix**, a fictional Colombian dropshipping company.
-Six months of sales data (Nov 2025 – Apr 2026) analyzed with Python, SQL Server, and Power BI.
+Análisis de datos **sintéticos** de una tienda ficticia colombiana, de noviembre de 2025 a abril de 2026. El proyecto explora rentabilidad de productos, segmentos RFM y campañas Meta Ads con Python, SQL Server y un dashboard de Power BI.
 
----
+## Resultados reproducibles
 
-## Objective
+| Indicador | Resultado |
+|---|---:|
+| Órdenes raw (incluyen 35 duplicados inyectados) | 3,535 |
+| Órdenes limpias | 3,494 |
+| Clientes únicos | 1,648 |
+| Ingresos | USD 191,476.48 |
+| Ganancia después de COGS y envío | USD 95,495.39 |
+| Margen sobre ingresos | 49.9% |
 
-Identify the most profitable products, understand customer behavior through RFM segmentation,
-and evaluate Meta Ads campaign efficiency to support data-driven decisions.
+Estos resultados proceden de `scripts/regenerate_data.py` con semilla fija 2025. Los CSV en `data/raw/` y `data/processed/` son salidas de ese script. Los cuadernos `01` y `02` llaman y examinan ese mismo flujo; no generan otro conjunto distinto.
 
----
+### Productos
 
-## Dataset
+- **Mini Bicicleta Premium:** USD 90,877.56 de ingresos, USD 51,704 de ganancia, 757 unidades; es el producto con mayor ganancia.
+- **Vaso Térmico:** 1,465 unidades, el mayor volumen, y USD 25,650.92 de ganancia.
+- **Soporte Magnético:** 1,218 unidades y margen de 39.7%.
 
-| File | Description | Records |
-|------|-------------|---------|
-| `solvix_ordenes_raw.csv` | Orders with revenue, cost, margin and shipping | 3,500 |
-| `solvix_meta_ads_raw.csv` | Daily Meta Ads spend and attributed purchases | 360 |
+### Clientes
 
-**Period:** November 2025 – April 2026  
-**Cities:** Bogota, Medellin, Cali, Barranquilla, Bucaramanga  
-**Products:** 4 SKUs across 3 categories (Auto, Fitness, Oficina/Auto)
+La segmentación RFM usa como referencia el inicio del día posterior a la última orden. Así ninguna compra futura produce recencia negativa. Hay 371 clientes Champions y 358 Leales; juntos suman 729 clientes (44.2%) y USD 118,304.70 en ingresos (61.8%). Los 109 clientes En Riesgo registran USD 16,858.80 de ingresos históricos; esa cifra **no** representa ingresos recuperables garantizados.
 
----
+### Publicidad
 
-## Project Structure
+Los datos de campañas también son sintéticos. El gasto total limpio es USD 3,485.11 en Vaso Vertical y USD 5,236.58 en Bici Carrusel. La consulta `sql/queries/03_rendimiento_ads.sql` calcula ROAS uniendo gasto por campaña con ingresos clasificados por fuente. Es una estimación dentro de esta simulación, no prueba causal de ventas incrementales. Los conteos `Compras_Atribuidas` del archivo de Ads se generan separadamente de las órdenes, por lo que no deben presentarse como conciliados.
 
-```
-solvix-ecommerce-analytics/
-│
-├── data/
-│   ├── raw/                        # Original generated CSVs
-│   └── processed/                  # Cleaned data + RFM outputs + charts
-│
-├── notebooks/
-│   ├── 01_data_generation.ipynb    # Synthetic data generation
-│   ├── 02_cleaning_eda.ipynb       # Data cleaning and exploratory analysis
-│   ├── 03_product_profitability.ipynb  # Product revenue, margin and geo analysis
-│   └── 04_rfm_segmentation.ipynb   # RFM customer segmentation model
-│
-├── sql/
-│   ├── setup_database.py           # SQL Server database setup
-│   └── queries/
-│       ├── 01_ventas_mensuales.sql     # Monthly revenue trend
-│       ├── 02_top_productos.sql        # Top products by margin
-│       ├── 03_rendimiento_ads.sql      # ROAS and CPA by campaign
-│       └── 04_comportamiento_clientes.sql  # Customer behavior metrics
-│
-├── dashboard/                      # Power BI .pbix and screenshots
-├── README.md
-└── requirements.txt
-```
-
----
-
-## Tech Stack
-
-| Tool | Purpose |
-|------|---------|
-| Python + Pandas | Data generation, cleaning, EDA, RFM segmentation |
-| SQL Server (T-SQL) | Business metrics queries, ROAS analysis |
-| Power BI | Interactive dashboard for stakeholders |
-| Matplotlib | Exploratory and publication-quality charts |
-
----
-
-## Key Findings
-
-### Products
-- **Vaso Termico** leads in profit ($30,832) and volume (1,771 units) — the anchor product
-- **Mini Bicicleta** leads in revenue ($76,080) at $120 avg ticket with 39.9% margin
-- **Soporte Magnetico** has the highest margin (45.0%) — best efficiency per unit
-- Overall portfolio margin: **42.7%**
-
-### RFM Customer Segmentation (1,404 unique customers)
-- **Champions** (23.3% of customers) generate **49.8% of total revenue** ($93,473)
-- **Champions + Leales** = 614 customers (43.7%) drive **68% of all revenue**
-- **En Riesgo**: 91 customers with $15,187 recoverable through reactivation campaigns
-- **Hibernando**: 212 customers reachable with low-cost push/email campaigns
-
-### Meta Ads Performance
-- **Campana_Vaso_Vertical**: ROAS 20.3x — ROI 782%
-- **Campana_Bici_Carrusel**: ROAS 8.91x — ROI 265%
-- Both campaigns above break-even (ROAS > 4x), with Vaso Vertical as the standout performer
-
----
-
-## How to Run
+## Ejecutar
 
 ```bash
-git clone https://github.com/Wild2Data/solvix-ecommerce-analytics.git
-cd solvix-ecommerce-analytics
 pip install -r requirements.txt
+python -X utf8 scripts/regenerate_data.py
+python -X utf8 scripts/run_products_notebook.py
+python -X utf8 scripts/run_rfm_notebook.py
 ```
 
-Open notebooks in order starting with `01_data_generation.ipynb`.
+Abre los cuadernos `notebooks/01_data_generation.ipynb` y `02_cleaning_eda.ipynb` desde la raíz del repositorio o desde `notebooks/`. `03_product_profitability.ipynb` y `04_rfm_segmentation.ipynb` se reconstruyen con resultados ejecutados mediante sus respectivos scripts. Para SQL Server, configura la conexión de `sql/setup_database.py` y ejecuta después las consultas de `sql/queries/`.
 
-For SQL queries: run `sql/setup_database.py` to create the SQL Server database,
-then execute queries in `sql/queries/` using SSMS or Azure Data Studio.
+## Estructura
 
----
+- `scripts/`: generación, limpieza y construcción de cuadernos.
+- `data/raw/`: CSV sintéticos con errores inyectados para practicar limpieza.
+- `data/processed/`: CSV limpios, segmentos, métricas y gráficos derivados.
+- `notebooks/`: generación, control de calidad, productos y RFM.
+- `sql/`: carga y consultas de SQL Server.
+- `dashboard/`: capturas y tema de Power BI. Las capturas pueden reflejar una versión anterior de los datos; verifica las cifras contra los CSV actuales antes de presentarlas.
 
-## Author
+## Autor
 
-**Williams Aguilera Leon**  
-[LinkedIn](https://linkedin.com/in/wild2data) · [GitHub](https://github.com/Wild2Data)
+**Williams Aguilera León** · [LinkedIn](https://linkedin.com/in/wild2data) · [GitHub](https://github.com/Wild2Data)
