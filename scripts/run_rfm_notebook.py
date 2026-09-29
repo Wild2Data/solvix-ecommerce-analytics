@@ -74,13 +74,13 @@ MD[2] = (
     "## 1. Carga y preparacion de datos\n"
     "\n"
     "Se leen las ordenes limpias del pipeline de EDA (notebook 02). "
-    "La fecha de referencia es el ultimo dia del periodo: **2026-04-30**."
+    "La fecha de referencia es el inicio del dia siguiente a la ultima orden. Asi la recencia nunca es negativa."
 )
 
 CD[3] = (
     "df = pd.read_csv('data/processed/solvix_ordenes_clean.csv', parse_dates=['Fecha'])\n"
     "\n"
-    "FECHA_REF = pd.Timestamp('2026-04-30')\n"
+    "FECHA_REF = df['Fecha'].max().normalize() + pd.Timedelta(days=1)\n"
     "\n"
     "print(f'Ordenes cargadas : {len(df):,}')\n"
     "print(f'Clientes unicos  : {df[\"ID_Cliente\"].nunique():,}')\n"
